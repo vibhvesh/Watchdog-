@@ -1,0 +1,57 @@
+# Copy this file to .github/workflows/pages.yml in a confirmed GitHub repository.
+# It is not active in the Origin draft. It builds only apps/pages-demo.
+name: pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - "apps/pages-demo/**"
+      - ".github/workflows/pages.yml"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/pages-demo/package-lock.json
+      - id: pages
+        uses: actions/configure-pages@v5
+      - name: Build static sample
+        working-directory: apps/pages-demo
+        run: |
+          npm ci
+          base="${{ steps.pages.outputs.base_path }}"
+          if [ -z "$base" ] || [ "$base" = "/" ]; then
+            export PAGES_BASE=/
+          else
+            export PAGES_BASE="${base%/}/"
+          fi
+          npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/pages-demo/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
