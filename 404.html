@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Boomdock Watchdog</title>
+  <script>
+    var prefix = "/Watchdog-";
+    var path = location.pathname;
+    if (prefix && path.indexOf(prefix) === 0) path = path.slice(prefix.length);
+    path = path.replace(/^\//, "").replace(/\/index\.html$/, "");
+    location.replace(prefix + "/#/" + path + location.search);
+  </script>
+</head>
+<body>Opening the Boomdock Watchdog sample…</body>
+</html>
