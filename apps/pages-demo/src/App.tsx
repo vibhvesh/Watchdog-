@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { CommandCenter } from "./CommandCenter";
 import { answerQuestion } from "./analytics";
 import { applyScenario, buildFleet, counts, diskBytes, displayStatus, formatBytes, jitter, SERVICES, type Host, type RolePreview, type ScenarioAction, type Status } from "./model";
 
@@ -57,6 +58,8 @@ export function App() {
   const tally = useMemo(() => counts(hosts), [hosts]);
   const host = hosts.find((item) => item.hostname === route.id);
 
+  if (route.name === "command") return <CommandCenter />;
+
   return (
     <div className="shell">
       <aside className="side">
@@ -67,6 +70,7 @@ export function App() {
         <p className="muted">{role === "admin" ? "Admin preview" : "User preview"}</p>
         <nav className="nav" aria-label="Sample">
           <a className={route.name === "overview" ? "active" : ""} href="#/">Overview</a>
+          <a className={route.name === "command" ? "active" : ""} href="#/command">Command center</a>
           <a href="#/servers">Servers</a>
           <a href="#/services">Services</a>
           <a href="#/disks">Disks</a>

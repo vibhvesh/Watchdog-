@@ -63,3 +63,20 @@ test("static sample supports preview, filters, scenarios, and analytics", async 
   await expect(page.getByTestId("analytics")).toContainText("not measurements");
   expect(apiCalls).toEqual([]);
 });
+
+test("command center is a scripted fullscreen sample", async ({ page }) => {
+  const apiCalls: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().includes("/api/")) apiCalls.push(request.url());
+  });
+  await page.goto("/Watchdog-/#/command");
+  await expect(page.getByTestId("command-center")).toBeVisible();
+  await expect(page.getByTestId("demo-badge")).toHaveText("DEMO • SIMULATED DATA");
+  await expect(page.getByTestId("rack").locator(".tile")).toHaveCount(40);
+  await expect(page.getByTestId("network")).toContainText("simulated");
+  await expect(page.getByTestId("wall-view")).toHaveText(/Infra health|Application outage|Network loss|Disk risk|Recovery/);
+  await expect(page.getByTestId("wall-pause")).toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("wall-pause")).toBeVisible();
+  expect(apiCalls).toEqual([]);
+});
